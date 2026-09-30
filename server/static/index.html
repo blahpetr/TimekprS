@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>TimekprS</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <h1>TimekprS</h1>
+        <div class="auth-area">
+          <span id="auth-status"></span>
+          <button id="auth-button" class="button">Sign in</button>
+        </div>
+      </header>
+      <div class="profile-controls">
+        <label for="profile-select">Profile</label>
+        <select id="profile-select" disabled>
+          <option value="">Loading…</option>
+        </select>
+        <button
+          id="refresh-profiles"
+          class="button"
+          aria-label="Refresh profiles"
+        >
+          Refresh
+        </button>
+      </div>
+      <div id="page-error" class="error" role="alert" hidden></div>
+      <section id="empty-state" class="empty-state" hidden>
+        <h2>No profiles yet</h2>
+        <p>
+          Add <code>timekpr.*.conf</code> files to the server’s synced folder.
+        </p>
+        <button id="empty-refresh" class="button">Check for profiles</button>
+      </section>
+      <div id="dashboard" hidden>
+        <section class="stats" aria-label="Schedule summary">
+          <div class="stat">
+            <span class="stat-label">Weekly hours</span>
+            <div class="stat-value">
+              <span id="weekly-hours">0</span><span class="stat-unit">hrs</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Enabled days</span>
+            <div class="stat-value">
+              <span id="enabled-days">0</span><span class="stat-unit">/ 7</span>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Today’s hours</span>
+            <div class="stat-value">
+              <span id="today-hours">0</span><span class="stat-unit">hrs</span>
+            </div>
+          </div>
+        </section>
+        <section class="schedule-card" aria-labelledby="schedule-title">
+          <div class="schedule-header">
+            <h2 id="schedule-title">Weekly schedule</h2>
+            <div class="legend">
+              <span class="legend-box allowed"></span>Allowed<span
+                class="legend-box"
+              ></span
+              >Unavailable
+            </div>
+          </div>
+          <div class="schedule-toolbar">
+            <span>24-hour format · Click an hour to toggle it</span>
+            <button id="copy-weekdays" class="text-button">
+              Apply Monday to weekdays
+            </button>
+          </div>
+          <div class="grid-scroll">
+            <div
+              id="schedule-grid"
+              class="schedule-grid"
+              role="group"
+              aria-label="Allowed hours by day"
+            ></div>
+          </div>
+          <div class="save-bar">
+            <span id="save-status" role="status">All changes saved</span>
+            <div class="save-actions">
+              <a id="download-link" class="text-button" href="#" download
+                >Download config</a
+              >
+              <button id="discard-button" class="button" disabled>
+                Discard
+              </button>
+              <button id="save-button" class="button button-primary" disabled>
+                Save schedule
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <dialog id="login-dialog" aria-labelledby="login-title">
+      <form id="login-form">
+        <div class="dialog-header">
+          <h2 id="login-title">Sign in</h2>
+          <button
+            type="button"
+            id="close-login"
+            class="button"
+            aria-label="Close sign-in"
+          >
+            Close
+          </button>
+        </div>
+        <label for="username">Username</label
+        ><input
+          id="username"
+          name="username"
+          autocomplete="username"
+          required
+        />
+        <label for="password">Password</label
+        ><input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        <p id="login-error" class="error" role="alert" hidden></p>
+        <button id="login-submit" class="button button-primary" type="submit">
+          Sign in
+        </button>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>
