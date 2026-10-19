@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timekpr Manager</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <h1>Timekpr Manager</h1>
+      </header>
+
+      <main>
+        <section id="login-panel" class="panel">
+          <h2>Login</h2>
+          <label>
+            Username
+            <input id="username" type="text" value="admin" />
+          </label>
+          <label>
+            Password
+            <input id="password" type="password" value="admin" />
+          </label>
+          <button id="login-btn">Authenticate</button>
+          <p id="login-status" class="status"></p>
+        </section>
+
+        <section id="editor-panel" class="panel hidden">
+          <div class="toolbar">
+            <h2>Configuration</h2>
+            <select id="file-select">
+              <option value="timekpr.kuba.conf">timekpr.kuba.conf</option>
+              <option value="timekpr.sam.conf">timekpr.sam.conf</option>
+            </select>
+            <button id="load-btn">Load</button>
+            <button id="logout-btn" class="secondary">Logout</button>
+          </div>
+
+          <div class="day-grid">
+            <div class="field">
+              <label>Monday</label>
+              <input id="monday" type="text" />
+            </div>
+            <div class="field">
+              <label>Tuesday</label>
+              <input id="tuesday" type="text" />
+            </div>
+            <div class="field">
+              <label>Wednesday</label>
+              <input id="wednesday" type="text" />
+            </div>
+            <div class="field">
+              <label>Thursday</label>
+              <input id="thursday" type="text" />
+            </div>
+            <div class="field">
+              <label>Friday</label>
+              <input id="friday" type="text" />
+            </div>
+            <div class="field">
+              <label>Saturday</label>
+              <input id="saturday" type="text" />
+            </div>
+            <div class="field">
+              <label>Sunday</label>
+              <input id="sunday" type="text" />
+            </div>
+          </div>
+
+          <div class="field wide">
+            <label>Allowed Weekdays (1-7, comma-separated)</label>
+            <input id="week" type="text" />
+          </div>
+
+          <div class="actions">
+            <button id="save-btn">Save</button>
+            <button id="reload-btn" class="secondary">Reload</button>
+          </div>
+
+          <p id="save-status" class="status"></p>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
