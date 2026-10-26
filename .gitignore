@@ -1,3 +1,4 @@
 __pycache__
 timekpr.*.conf
 *.bak
+.venv/

@@ -2,11 +2,16 @@
 from fastapi import Depends, FastAPI, Response, status, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from typing import Annotated
 import hashlib
 import os
+from pathlib import Path
+
+SERVER_DIR = Path(__file__).resolve().parent
+SYNC_DIR = Path(os.environ.get("TIMEKPRS_SYNC_DIR", SERVER_DIR / "synced")).resolve()
 
 class File(BaseModel):
     name: str
@@ -21,22 +26,23 @@ class File(BaseModel):
 
 app = FastAPI()
 security = HTTPBasic()
+app.mount("/static", StaticFiles(directory=SERVER_DIR / "static"), name="static")
 
 USERNAME = "admin"
 PASSWORD = "admin" #NOTE: Replace me with better password saving later
 
 def writeFile(filename: str, hours: list[list[int]], week: list[int]):
-    with open("synced/" + filename, "r") as file:
+    with open(SYNC_DIR / filename, "r") as file:
         lines = file.readlines()
     for i in range(0, 7):
             lines[i + 9] = "ALLOWED_HOURS_" + str(i+1) + " = " + (";".join(str(n) for n in hours[i])) + "\n"
     lines[17] = "ALLOWED_WEEKDAYS = " + (";".join(str(n) for n in week)) + "\n"
-    with open("synced/" + filename, "w") as file:
+    with open(SYNC_DIR / filename, "w") as file:
         file.writelines(lines)
     return
 
 def readFile(filename: str):
-    with open("synced/" + filename, "r") as file:
+    with open(SYNC_DIR / filename, "r") as file:
         lines = file.readlines()
     return {"name": filename, 
     "monday": lines[9].split('=')[1].strip().split(';'), 
@@ -49,13 +55,27 @@ def readFile(filename: str):
     "week": lines[17].split('=')[1].strip().split(';')}
 
 def checkFilename(filename: str):
-    if "/" in filename:
+    if not filename or "/" in filename or "\\" in filename or (SYNC_DIR / filename).resolve().parent != SYNC_DIR:
         raise HTTPException(status_code = 400, detail="Invalid file name")
     else:
-        if os.path.isfile("synced/" + filename):
+        if (SYNC_DIR / filename).is_file():
             return True
         else:
             raise HTTPException(status_code = 404, detail="File does not exist")
+
+@app.get("/", include_in_schema=False)
+async def dashboard():
+    return FileResponse(SERVER_DIR / "static" / "index.html")
+
+@app.get("/api/timekpr/files")
+async def files():
+    """List the Timekpr configuration files available to the dashboard."""
+    if not SYNC_DIR.is_dir():
+        return {"files": []}
+    return {"files": sorted(
+        path.name for path in SYNC_DIR.glob("timekpr.*.conf")
+        if path.is_file() and path.resolve().parent == SYNC_DIR
+    )}
 
 @app.get("/api/timekpr/hello", status_code=200)
 async def hello():
@@ -72,14 +92,14 @@ async def private(credentials: Annotated[HTTPBasicCredentials, Depends(security)
 async def hash(item: str):
     checkFilename(item)
 
-    with open("synced/" + item, "rb") as f:
+    with open(SYNC_DIR / item, "rb") as f:
         return {"hash": hashlib.blake2b(f.read(), digest_size=8).hexdigest()}
 
 @app.get("/api/timekpr/file", status_code=200)
 async def file(item: str, file: bool):
     checkFilename(item)
     if file:
-        return FileResponse("synced/" + item)
+        return FileResponse(SYNC_DIR / item)
     else:
         return readFile(item)
 
@@ -95,4 +115,3 @@ async def edit(credentials: Annotated[HTTPBasicCredentials, Depends(security)], 
         return Response(status_code=205)
     else:
         raise HTTPException(status_code = 422, detail="Invalid intigers given")
-
