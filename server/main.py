@@ -73,7 +73,7 @@ async def hash(item: str):
     checkFilename(item)
 
     with open("synced/" + item, "rb") as f:
-        return {"hash": hashlib.blake2b(f.read(), digest_size=8).hexdigest()}
+        return {"hash": hashlib.blake2s(f.read(), digest_size=8).hexdigest()}
 
 @app.get("/api/timekpr/file", status_code=200)
 async def file(item: str, file: bool):
